@@ -8,7 +8,7 @@ bookRouter.post("/add", async (req, res) => {
   try {
     const newBook = new BookModel(payload);
     await newBook.save();
-    res.status(200).json({ message: "Book added successfully" });
+    res.status(200).json({ message: "Book added successfully", book: newBook });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
     console.log(error);
@@ -33,9 +33,19 @@ bookRouter.get("/filter", async (req, res) => {
   if (order === "asc") order = ``;
   else if (order === "desc") order = `-`;
   try {
-    const books = await BookModel.find({ Genre: filter }).sort(
-      `${order}${sort}`
-    );
+    if (!filter && !order) {
+      var books = await BookModel.find();
+    }
+    if (!filter) {
+      var books = await BookModel.find().sort(`${order}${sort}`);
+    } else if (!order) {
+      var books = await BookModel.find({ Genre: filter });
+    } else {
+      var books = await BookModel.find({ Genre: filter }).sort(
+        `${order}${sort}`
+      );
+    }
+
     if (!books[0])
       return res.status(404).json({ message: "No book available" });
     res.status(200).send(books);
