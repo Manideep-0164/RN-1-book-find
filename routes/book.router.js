@@ -28,9 +28,11 @@ bookRouter.get('/get', async(req, res) => {
  });
 
  bookRouter.get('/filter', async(req, res) => {
-    const {filter, sort} = req.query
+    const {filter, sort, order} = req.query
+   if(order === 'asc') order=``;
+   else if(order === 'desc') order = `-`
     try {
-     const books = await BookModel.find({Genre:filter}).sort(`-${sort}`);
+     const books = await BookModel.find({Genre:filter}).sort(`${order}${sort}`);
      if(!books[0]) return res.status(404).json({message:"No book available"});
      res.status(200).send(books);
     } catch (error) {
